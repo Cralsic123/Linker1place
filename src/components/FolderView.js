@@ -20,7 +20,7 @@ export default function FolderView({ folder, userId }) {
       setLinks(data || []);
       setLoading(false);
     });
-  }, [folder?.id]);
+  }, [folder]);
 
   const handleDrop = useCallback(async (e) => {
     e.preventDefault();

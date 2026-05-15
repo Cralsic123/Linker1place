@@ -92,7 +92,7 @@ export default function ChatBot({ folderName, onDragLink }) {
         body: JSON.stringify({
           model: 'claude-sonnet-4-20250514',
           max_tokens: 1000,
-          system: SYSTEM_PROMPT.replace('${folderName}', folderName),
+          system: SYSTEM_PROMPT.replace('{folderName}', folderName),
           messages: apiMessages,
         }),
       });
