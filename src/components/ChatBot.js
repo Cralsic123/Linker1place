@@ -86,19 +86,40 @@ export default function ChatBot({ folderName, onDragLink }) {
         content: m.content,
       }));
 
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 1000,
-          system: SYSTEM_PROMPT.replace('{folderName}', folderName),
-          messages: apiMessages,
-        }),
-      });
+      const groqKey = localStorage.getItem('groq_key');
+
+if (!groqKey) {
+  throw new Error('Please enter your Groq API key');
+}
+
+const response = await fetch(
+  'https://api.groq.com/openai/v1/chat/completions',
+  {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${groqKey}`
+    },
+    body: JSON.stringify({
+      model: 'llama-3.3-70b-versatile',
+      messages: [
+        {
+          role: 'system',
+          content: SYSTEM_PROMPT.replace('{folderName}', folderName)
+        },
+        ...apiMessages
+      ],
+      temperature: 0.4,
+      max_tokens: 1200
+    })
+  }
+);
 
       const data = await response.json();
-      const assistantContent = data.content?.[0]?.text || 'Sorry, I could not get a response.';
+
+const assistantContent =
+  data.choices?.[0]?.message?.content ||
+'Sorry, I could not get a response.';
       
       setMessages(prev => [...prev, { role: 'assistant', content: assistantContent }]);
     } catch (err) {
@@ -195,7 +216,24 @@ export default function ChatBot({ folderName, onDragLink }) {
         )}
         <div ref={messagesEndRef} />
       </div>
+      <div style={styles.apiRow}>
+  <input
+    type="password"
+    placeholder="Enter Groq API Key..."
+    value={localStorage.getItem('groq_key') || ''}
+    onChange={(e) => localStorage.setItem('groq_key', e.target.value)}
+    style={styles.apiInput}
+  />
 
+  <a
+    href="https://console.groq.com/keys"
+    target="_blank"
+    rel="noreferrer"
+    style={styles.apiLink}
+  >
+    Get API Key
+  </a>
+</div>
       <div style={styles.inputArea}>
         <div style={styles.quickBtns}>
           {[`YouTube for ${folderName}`, 'Best practice sites', 'Beginner roadmap'].map(q => (
@@ -354,6 +392,30 @@ const styles = {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
+  apiRow: {
+  display: 'flex',
+  gap: '10px',
+  marginBottom: '12px',
+  alignItems: 'center'
+},
+
+apiInput: {
+  flex: 1,
+  background: 'var(--surface)',
+  border: '1px solid var(--border)',
+  color: 'white',
+  padding: '10px',
+  borderRadius: '10px',
+  outline: 'none',
+  fontSize: '12px'
+},
+
+apiLink: {
+  color: 'var(--accent)',
+  textDecoration: 'none',
+  fontSize: '12px',
+  whiteSpace: 'nowrap'
+},
   chipDesc: {
     fontSize: '11px',
     color: 'var(--text-dimmer)',
