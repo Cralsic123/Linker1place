@@ -17,7 +17,7 @@ export default function Dashboard() {
       if (data && data.length > 0) setActiveFolder(data[0]);
       setLoadingFolders(false);
     });
-  }, [user?.id]);
+  }, [user]);
 
   return (
     <div style={styles.root}>
