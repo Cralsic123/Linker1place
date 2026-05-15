@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useDraggable } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
-import { getYouTubeVideoId, getYouTubeThumbnail, getFavicon, extractDomain, getLinkType, isYouTubeUrl } from '../lib/urlUtils';
+import { getYouTubeVideoId, getYouTubeThumbnail, getFavicon, extractDomain, getLinkType } from '../lib/urlUtils';
 import { deleteLink, updateLink } from '../lib/supabase';
 
 export default function LinkCard({ link, onDeleted, onUpdated, isDraggable = false }) {
@@ -12,9 +12,7 @@ export default function LinkCard({ link, onDeleted, onUpdated, isDraggable = fal
   const [hovered, setHovered] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable
-    ? useDraggable({ id: link.id, data: { link } })
-    : { attributes: {}, listeners: {}, setNodeRef: null, transform: null, isDragging: false };
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({ id: link.id, data: { link } });
 
   const style = transform ? { transform: CSS.Translate.toString(transform) } : {};
 
